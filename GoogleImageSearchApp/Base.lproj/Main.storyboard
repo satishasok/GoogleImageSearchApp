@@ -16,14 +16,17 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NtD-oT-kIR">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NtD-oT-kIR">
                                 <rect key="frame" x="0.0" y="65" width="320" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="R3t-Pa-5DM"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="HwY-VK-h9Q">
+                            <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="HwY-VK-h9Q">
                                 <rect key="frame" x="0.0" y="89" width="320" height="479"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="5" minimumInteritemSpacing="5" id="BGw-L3-4jc">
@@ -40,25 +43,31 @@
                                             <rect key="frame" x="0.0" y="0.0" width="90" height="120"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" tag="100" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mU0-pz-881" customClass="AsyncImageView">
+                                                <imageView userInteractionEnabled="NO" tag="100" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="mU0-pz-881" customClass="AsyncImageView">
                                                     <rect key="frame" x="0.0" y="0.0" width="90" height="120"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 </imageView>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
+                                        <constraints>
+                                            <constraint firstItem="mU0-pz-881" firstAttribute="leading" secondItem="4LW-Aq-Tuq" secondAttribute="leading" id="Hkl-Ub-r1E"/>
+                                            <constraint firstAttribute="bottom" secondItem="mU0-pz-881" secondAttribute="bottom" id="WMQ-FY-uBm"/>
+                                            <constraint firstAttribute="trailing" secondItem="mU0-pz-881" secondAttribute="trailing" id="ZBm-oU-8Y3"/>
+                                            <constraint firstItem="mU0-pz-881" firstAttribute="top" secondItem="4LW-Aq-Tuq" secondAttribute="top" id="sE5-RO-TM8"/>
+                                        </constraints>
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="0bI-Vb-Wc8">
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="0bI-Vb-Wc8">
                                 <rect key="frame" x="150" y="94" width="20" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </activityIndicatorView>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="s8x-fw-f2U">
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="s8x-fw-f2U">
                                 <rect key="frame" x="150" y="548" width="20" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </activityIndicatorView>
-                            <searchBar contentMode="redraw" fixedFrame="YES" placeholder="Search for images in google" translatesAutoresizingMaskIntoConstraints="NO" id="gg1-gC-YDo">
+                            <searchBar contentMode="redraw" placeholder="Search for images in google" translatesAutoresizingMaskIntoConstraints="NO" id="gg1-gC-YDo">
                                 <rect key="frame" x="0.0" y="21" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <textInputTraits key="textInputTraits"/>
@@ -68,6 +77,22 @@
                             </searchBar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="gg1-gC-YDo" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="1" id="BvJ-Oj-iOX"/>
+                            <constraint firstItem="NtD-oT-kIR" firstAttribute="trailing" secondItem="gg1-gC-YDo" secondAttribute="trailing" id="OIe-Ck-Lel"/>
+                            <constraint firstItem="HwY-VK-h9Q" firstAttribute="top" secondItem="NtD-oT-kIR" secondAttribute="bottom" constant="3" id="Ou6-k4-98D"/>
+                            <constraint firstItem="HwY-VK-h9Q" firstAttribute="bottom" secondItem="s8x-fw-f2U" secondAttribute="bottom" id="TE6-nJ-8op"/>
+                            <constraint firstItem="0bI-Vb-Wc8" firstAttribute="top" secondItem="NtD-oT-kIR" secondAttribute="bottom" constant="8" symbolic="YES" id="TN2-7f-vjb"/>
+                            <constraint firstAttribute="trailing" secondItem="HwY-VK-h9Q" secondAttribute="trailing" id="WHA-md-VTV"/>
+                            <constraint firstItem="NtD-oT-kIR" firstAttribute="leading" secondItem="HwY-VK-h9Q" secondAttribute="leading" id="cKr-g9-opy"/>
+                            <constraint firstItem="NtD-oT-kIR" firstAttribute="trailing" secondItem="HwY-VK-h9Q" secondAttribute="trailing" id="h8u-T9-Cme"/>
+                            <constraint firstItem="NtD-oT-kIR" firstAttribute="centerX" secondItem="0bI-Vb-Wc8" secondAttribute="centerX" id="mJa-GS-krk"/>
+                            <constraint firstItem="0bI-Vb-Wc8" firstAttribute="leading" secondItem="s8x-fw-f2U" secondAttribute="leading" id="qzO-o4-bu3"/>
+                            <constraint firstItem="gg1-gC-YDo" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="r12-iG-G98"/>
+                            <constraint firstAttribute="bottom" secondItem="s8x-fw-f2U" secondAttribute="bottom" id="tg8-2h-oIw"/>
+                            <constraint firstItem="NtD-oT-kIR" firstAttribute="top" secondItem="gg1-gC-YDo" secondAttribute="bottom" id="tmd-lw-VRs"/>
+                            <constraint firstItem="NtD-oT-kIR" firstAttribute="leading" secondItem="gg1-gC-YDo" secondAttribute="leading" id="vns-Cy-MvH"/>
+                        </constraints>
                     </view>
                     <connections>
                         <outlet property="firstSearchLoadActivityIndicator" destination="0bI-Vb-Wc8" id="Dhg-NT-Kgk"/>
