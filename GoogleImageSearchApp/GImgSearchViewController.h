@@ -9,6 +9,6 @@
 #import <UIKit/UIKit.h>
 #import "GImgSearchFetchingService.h"
 
-@interface GImgSearchViewController : UIViewController <UICollectionViewDelegate, UICollectionViewDataSource, UISearchBarDelegate, GImgSearchFetchDelegate, UITableViewDataSource, UITableViewDelegate>
+@interface GImgSearchViewController : UIViewController <UICollectionViewDelegate, UICollectionViewDataSource, UISearchBarDelegate, UISearchDisplayDelegate, GImgSearchFetchDelegate, UITableViewDataSource, UITableViewDelegate>
 
 @end

@@ -5,6 +5,10 @@
 //  Created by Satish Asok on 8/3/14.
 //  Copyright (c) 2014 Satish Asok. All rights reserved.
 //
+// A Simple wrapper for NSCache, so that we can cache images with NSURL as the key
+// Implements a singleton pattern, so that we can use this cache every where in the application.
+// Right now, we can only way to clear the entire cache.
+// but potentially we could add method to clear partial cache based on the last loaded used time.
 
 #import "GImgSearchImageCachingService.h"
 

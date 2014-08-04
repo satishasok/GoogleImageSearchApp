@@ -21,12 +21,13 @@
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *firstSearchLoadActivityIndicator;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *scrollToBottomSearchLoadActivityIndicator;
 @property (weak, nonatomic) IBOutlet UILabel *searchResultsTitle;
-@property (weak, nonatomic) IBOutlet UITableView *googleImageSearchHistoryTableView;
 
 
 // model/service objects
 @property (strong, nonatomic) NSString *currentGoogleImageSearchString;
 @property (strong, nonatomic, readonly) GImgSearchFullResults *googleImageSearchResults;
+@property (strong, nonatomic, readonly) NSArray *googleImageSearchHistory;
+@property (strong, nonatomic) NSMutableArray *filteredGoogleImageSearchHistory;
 @property (strong, nonatomic) GImgSearchFetchingService *localFetchingService;
 
 @end
@@ -59,8 +60,6 @@
     [self setupSearchbar];
     
     [self setupCollectionView];
-    
-    [self setupSearchHistoryTableView];
 
     self.searchResultsTitle.hidden = YES;
 
@@ -92,16 +91,8 @@
     
 }
 
-- (void)setupSearchHistoryTableView
-{
-    self.googleImageSearchHistoryTableView.hidden = YES;
-    self.googleImageSearchHistoryTableView.dataSource = self;
-    self.googleImageSearchHistoryTableView.delegate = self;
-}
-
 - (void)dismissKeyboard:(id)sender
 {
-    self.googleImageSearchHistoryTableView.hidden = YES;
     [self.googleImageSearchBar resignFirstResponder];
 }
 
@@ -111,6 +102,8 @@
     
     // clear out all the image memory cache if we received memory warning
     [[GImgSearchImageCachingService sharedInstance] clearCache];
+    
+    // potentially in the future clear out the google image search results for queries.
 }
 
 - (GImgSearchFullResults *)googleImageSearchResults
@@ -121,6 +114,15 @@
     
     [self.googleImageResultsCollectionsView reloadData];
     return  nil;
+}
+
+-(NSMutableArray *)filteredGoogleImageSearchHistory
+{
+    if (!_filteredGoogleImageSearchHistory) {
+        _filteredGoogleImageSearchHistory = [[NSMutableArray alloc] init];
+    }
+    
+    return _filteredGoogleImageSearchHistory;
 }
 
 - (GImgSearchFetchingService *)localFetchingService
@@ -161,11 +163,6 @@
     return cell;
 }
 
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    self.googleImageSearchBar.text = [[GImgSearchFetchingService sharedInstance] getGoogleImageSearchHistory][indexPath.row];
-    self.googleImageSearchHistoryTableView.hidden = YES;
-}
 
 #pragma GImgSearchFetchDelegate methods
 -(void)willBeginFetchForQuery:(NSString *)query isFirstFetch:(BOOL)isFirstFetch
@@ -197,11 +194,31 @@
 - (void) fetchedDataAlreadyAvailableForQuery:(NSString *)query
 {
     if ([query isEqualToString:self.currentGoogleImageSearchString]) {
-        [self.firstSearchLoadActivityIndicator stopAnimating];
-        [self.scrollToBottomSearchLoadActivityIndicator stopAnimating];
-        self.searchResultsTitle.text = self.currentGoogleImageSearchString;
-        self.searchResultsTitle.hidden = NO;
-        [self.googleImageResultsCollectionsView reloadData];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.firstSearchLoadActivityIndicator stopAnimating];
+            [self.scrollToBottomSearchLoadActivityIndicator stopAnimating];
+            self.searchResultsTitle.text = self.currentGoogleImageSearchString;
+            self.searchResultsTitle.hidden = NO;
+            [self.googleImageResultsCollectionsView reloadData];
+        });
+    }
+}
+
+- (void) didFailToFetchforQuery:(NSString *)query
+{
+    if ([query isEqualToString:self.currentGoogleImageSearchString]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.firstSearchLoadActivityIndicator stopAnimating];
+            [self.scrollToBottomSearchLoadActivityIndicator stopAnimating];
+            
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Google Image Search failed!"
+                                                            message:@"There was an error when searching google for images. Check your network connection and try again!"
+                                                           delegate:self
+                                                  cancelButtonTitle:@"OK"
+                                                  otherButtonTitles:nil];
+            
+            [alert show];
+        });
     }
 }
 
@@ -210,9 +227,11 @@
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
 {
     self.currentGoogleImageSearchString = searchBar.text;
-    [searchBar endEditing:YES];
-    
-    self.googleImageSearchHistoryTableView.hidden = YES;
+    [self.googleImageSearchBar endEditing:YES];
+    [self.googleImageSearchBar resignFirstResponder];
+    self.googleImageSearchBar.text = @"";
+    self.googleImageSearchBar.showsCancelButton = NO;
+
     
     [self.googleImageResultsCollectionsView reloadData];
     [self.localFetchingService firstFetchForQuery:self.currentGoogleImageSearchString];
@@ -220,12 +239,34 @@
 
 - (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar
 {
+    self.googleImageSearchBar.showsCancelButton = YES;
+}
+
+-(void)filterContentForSearchText:(NSString*)searchText scope:(NSString*)scope {
+    // Update the filtered array based on the search text and scope.
+    // Remove all objects from the filtered search array
+    [self.filteredGoogleImageSearchHistory removeAllObjects];
     NSArray * cachedSearchHistory = [[GImgSearchFetchingService sharedInstance] getGoogleImageSearchHistory];
-    if (cachedSearchHistory.count) {
-        self.googleImageSearchHistoryTableView.hidden = NO;
-        [self.googleImageSearchHistoryTableView reloadData];
-    }
-    
+    // Filter the array using NSPredicate
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF beginsWith[cd] %@", searchText];
+    self.filteredGoogleImageSearchHistory= [NSMutableArray arrayWithArray:[cachedSearchHistory filteredArrayUsingPredicate:predicate]];
+}
+
+#pragma mark - UISearchDisplayController Delegate Methods
+-(BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString {
+    // Tells the table data source to reload when text changes
+    [self filterContentForSearchText:searchString scope:
+     [[self.searchDisplayController.searchBar scopeButtonTitles] objectAtIndex:[self.searchDisplayController.searchBar selectedScopeButtonIndex]]];
+    // Return YES to cause the search result table view to be reloaded.
+    return YES;
+}
+
+-(BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchScope:(NSInteger)searchOption {
+    // Tells the table data source to reload when scope bar selection changes
+    [self filterContentForSearchText:self.searchDisplayController.searchBar.text scope:
+     [[self.searchDisplayController.searchBar scopeButtonTitles] objectAtIndex:searchOption]];
+    // Return YES to cause the search result table view to be reloaded.
+    return YES;
 }
 
 #pragma scrollView delegate methods
@@ -249,7 +290,7 @@ static BOOL fetchWhenScrolledToBottom;
     fetchWhenScrolledToBottom = YES;
 }
 
-#pragma UITableview datasource and delegate methods - for Search History 
+#pragma UITableview datasource and delegate methods - for Search History as part of the UISearchDisplayResultsDelegate
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     return 1;
@@ -257,7 +298,7 @@ static BOOL fetchWhenScrolledToBottom;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [[GImgSearchFetchingService sharedInstance] getGoogleImageSearchHistory].count;
+    return self.filteredGoogleImageSearchHistory.count;
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
@@ -268,14 +309,22 @@ static BOOL fetchWhenScrolledToBottom;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *tableViewCellidentifier = @"SearchHistoryCell";
+    [tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:tableViewCellidentifier];
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:tableViewCellidentifier forIndexPath:indexPath];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:tableViewCellidentifier];
+    }
     
-    UILabel *label = (UILabel *)[cell viewWithTag:200];
-    NSString *previouslySearchedQuery = (NSString *)[[[GImgSearchFetchingService sharedInstance] getGoogleImageSearchHistory] objectAtIndex:indexPath.row];
-    label.text = previouslySearchedQuery;
+    NSString *previouslySearchedQuery = (NSString *)[self.filteredGoogleImageSearchHistory objectAtIndex:indexPath.row];
+    cell.textLabel.text = previouslySearchedQuery;
     
     return cell;
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    self.googleImageSearchBar.text = self.filteredGoogleImageSearchHistory[indexPath.row];
 }
 
 @end

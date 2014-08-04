@@ -17,8 +17,9 @@
 
 @property (strong, nonatomic) NSArray *imageSearchResults; // array of GImgSearchResult
 @property (assign, nonatomic, readonly) BOOL fullyFetched;
+@property (assign, nonatomic, readonly) BOOL fetchFailed;
 
-- (BOOL)fetchAndParseImageSearchResults;
+- (void)fetchAndParseImageSearchResults;
 
 
 @end

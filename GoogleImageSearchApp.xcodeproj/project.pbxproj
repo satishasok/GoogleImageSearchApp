@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FD4033B5198F6B8800175F12 /* Readme.md in Resources */ = {isa = PBXBuildFile; fileRef = FD4033B4198F6B8800175F12 /* Readme.md */; };
 		FD4184D1198E0E470031B9FF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD4184D0198E0E470031B9FF /* Foundation.framework */; };
 		FD4184D3198E0E470031B9FF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD4184D2198E0E470031B9FF /* CoreGraphics.framework */; };
 		FD4184D5198E0E470031B9FF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD4184D4198E0E470031B9FF /* UIKit.framework */; };
@@ -40,6 +41,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		FD4033B4198F6B8800175F12 /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Readme.md; sourceTree = "<group>"; };
 		FD4184CD198E0E470031B9FF /* GoogleImageSearchApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GoogleImageSearchApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FD4184D0198E0E470031B9FF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		FD4184D2198E0E470031B9FF /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -130,6 +132,7 @@
 		FD4184D6198E0E470031B9FF /* GoogleImageSearchApp */ = {
 			isa = PBXGroup;
 			children = (
+				FD4033B4198F6B8800175F12 /* Readme.md */,
 				FD418511198E1A930031B9FF /* services */,
 				FD41850C198E12140031B9FF /* models */,
 				FD418508198E11E80031B9FF /* views */,
@@ -285,6 +288,7 @@
 			files = (
 				FD4184E9198E0E470031B9FF /* Images.xcassets in Resources */,
 				FD4184DB198E0E470031B9FF /* InfoPlist.strings in Resources */,
+				FD4033B5198F6B8800175F12 /* Readme.md in Resources */,
 				FD4184E4198E0E470031B9FF /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -519,6 +523,7 @@
 				FD418501198E0E470031B9FF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		FD418502198E0E470031B9FF /* Build configuration list for PBXNativeTarget "GoogleImageSearchAppTests" */ = {
 			isa = XCConfigurationList;
@@ -527,6 +532,7 @@
 				FD418504198E0E470031B9FF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

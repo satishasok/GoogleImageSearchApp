@@ -18,7 +18,8 @@
 
 @implementation GImgSearchFetchingService
 
-static NSInteger numberOfPagesToFetchOnFirstFetch = 2;
+static NSInteger numberOfPagesToFetchOnFirstFetch = 2; // basically fetch 2 pages of results so that we can fill the page.
+static NSInteger defaultNumberOfPagesToFetch = 1;
 
 // singleton instance of the GImgSearchFetchingService & thread safe.
 + (GImgSearchFetchingService *)sharedInstance
@@ -61,11 +62,13 @@ static NSInteger numberOfPagesToFetchOnFirstFetch = 2;
     return  _cachedGoogleImageSearchHistory;
 }
 
+// fetches results for a query string for the first time, we always fetch 2 pages
+//
 - (void)firstFetchForQuery:(NSString *)query;
 {
     GImgSearchFullResults *searchResults = self.cachedGoogleImageSearchResults[query];
     
-    if (searchResults) {
+    if (searchResults && !searchResults.fetchFailed && searchResults.imageSearchResults.count) {
         // even though we already have the data, let the delegate know that they need reloadData
         [self.imgSearchFetchDelegate didFinishFetchingResultsForQuery:query];
     } else {
@@ -81,11 +84,13 @@ static NSInteger numberOfPagesToFetchOnFirstFetch = 2;
         // all data alrady fetched, so just let the delegate know
         [self.imgSearchFetchDelegate fetchedDataAlreadyAvailableForQuery:query];
     } else {
-        [self fetchGoogleImagesForQuery:query numPage:1]; // retrieve only one page.
+        [self fetchGoogleImagesForQuery:query numPage:defaultNumberOfPagesToFetch]; // retrieve only one page.
     }
 }
 
-
+// creates an NSOperation for each page requested and executed in the same queue sequentially,
+// finally there is completion operation that is executed in the end, completion operation is used
+// let the delegate know that the fetch is complete
 - (void)fetchGoogleImagesForQuery:(NSString *)query numPage:(NSInteger)numPages
 {
     GImgSearchFullResults *searchResults = self.cachedGoogleImageSearchResults[query];
@@ -114,7 +119,9 @@ static NSInteger numberOfPagesToFetchOnFirstFetch = 2;
         [pageQueryOperations addObject:pageQueryOperation];
         previousQueryOperation = pageQueryOperation;
     }
+    
     if ([pageQueryOperations count] > 0) {
+        // completion operation
         NSInvocationOperation *retriveGImgQueryQueueCompleteOperation =
                     [[NSInvocationOperation alloc] initWithTarget:self
                                                          selector:@selector(googleImageQueryRetriveCompleteForQuery:)
@@ -132,10 +139,19 @@ static NSInteger numberOfPagesToFetchOnFirstFetch = 2;
     
 }
 
+// selector for Completion Operation
 - (void)googleImageQueryRetriveCompleteForQuery:(NSString *)query
 {
-    [self.imgSearchFetchDelegate didFinishFetchingResultsForQuery:query];
-    
+    GImgSearchFullResults *searchResults = self.cachedGoogleImageSearchResults[query];
+    if (searchResults && !searchResults.fetchFailed) {
+        [self.imgSearchFetchDelegate didFinishFetchingResultsForQuery:query];
+    } else {
+        if (searchResults && searchResults.imageSearchResults.count) {
+            [self.imgSearchFetchDelegate fetchedDataAlreadyAvailableForQuery:query];
+        } else {
+            [self.imgSearchFetchDelegate didFailToFetchforQuery:query];
+        }
+    }
 }
 
 // API to fetch images from Google

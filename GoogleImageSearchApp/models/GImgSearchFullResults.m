@@ -16,6 +16,7 @@
 @property (strong, nonatomic) NSMutableArray *searchResultPages; // array of GImgSearchResultPage
 @property (strong, nonatomic) GImgSearchResultPage *currentResultsPage;
 @property (assign, nonatomic, readwrite) BOOL fullyFetched;
+@property (assign, nonatomic, readwrite) BOOL fetchFailed;
 
 @end
 
@@ -36,11 +37,13 @@ static NSInteger numberOfImagesToFetchPerPage = 8;
     return  self;
 }
 
+// external interface
 - (NSArray *)imageSearchResults
 {
     return self.searchResults;
 }
 
+// internal interface
 - (NSMutableArray *)searchResults
 {
     if (!_searchResults) {
@@ -50,6 +53,8 @@ static NSInteger numberOfImagesToFetchPerPage = 8;
     return _searchResults;
 }
 
+
+// lazy load internal properties
 - (NSMutableArray *)searchResultPages
 {
     if (!_searchResultPages) {
@@ -70,9 +75,10 @@ static NSInteger numberOfImagesToFetchPerPage = 8;
     return _currentResultsPage;
 }
 
-- (BOOL)fetchAndParseImageSearchResults
+#pragma mark - Fetch & Parse methods
+- (void)fetchAndParseImageSearchResults
 {
-    BOOL fetchSuccess = NO;
+    self.fetchFailed = YES;
     NSString *googleImgApiURLString = [NSString stringWithFormat:gImgSearchApiURLFormat,
                                        self.imageSearchString, numberOfImagesToFetchPerPage,
                                        self.currentResultsPage.pageStartIndex];
@@ -103,8 +109,6 @@ static NSInteger numberOfImagesToFetchPerPage = 8;
     } else {
         NSLog(@"Error: Response: %@, ResponseData: %@", googleImgApiResponse, googleImgResponseData);
     }
-    
-    return fetchSuccess;
 }
 
 - (void)parseGoogleImageSearchResponseDictionary:(NSDictionary *)responseDictionary
@@ -112,7 +116,7 @@ static NSInteger numberOfImagesToFetchPerPage = 8;
     NSDictionary *responseDataDictionary = [responseDictionary objectForKey:@"responseData"];
     if (responseDataDictionary &&
         [responseDataDictionary isKindOfClass:[NSDictionary class]]) {
-        
+        self.fetchFailed = NO;
         // Parse out the results
         NSArray *googleImgApiResultsArray = [responseDataDictionary objectForKey:@"results"];
         if (googleImgApiResultsArray && [googleImgApiResultsArray count] > 0) {
@@ -151,6 +155,8 @@ static NSInteger numberOfImagesToFetchPerPage = 8;
             self.currentResultsPage.pageStartIndex = -1;
             self.currentResultsPage.pageLabel = -1;
             self.fullyFetched = YES;
+            // google image api that is deprecated, does not allow u to get more that 8 pages of results. once we have reached the end of the cursor,
+            // we mark the result as fullyFetched. So that we do not try to get more results after that.
         }
     }
 }
